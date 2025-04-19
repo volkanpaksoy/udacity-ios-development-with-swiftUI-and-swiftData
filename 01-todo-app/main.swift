@@ -16,7 +16,7 @@ struct Todo : CustomStringConvertible, Codable {
 //  `func save(todos: [Todo])`: Persists the given todos.
 //  `func load() -> [Todo]?`: Retrieves and returns the saved todos, or nil if none exist.
 protocol Cache {
-    func save(todos: [Todo])
+    func save(todos: [Todo]) -> Bool
     func load() -> [Todo]?
 }
 
@@ -27,7 +27,7 @@ final class JSONFileManagerCache: Cache {
     private let dbName = "todos.json"
     let fileManager = FileManager.default
 
-    func save(todos: [Todo]) {
+    func save(todos: [Todo]) -> Bool {
         do {
             let encoder = JSONEncoder()
             let jsonData = try encoder.encode(todos)
@@ -35,9 +35,13 @@ final class JSONFileManagerCache: Cache {
             if let documentsDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first {
                 let fileURL = documentsDirectory.appendingPathComponent(dbName)
                 try jsonData.write(to: fileURL)
+                return true
             }
+
+            return false
         } catch {
             print("Error while saving the todo database: \(error)")
+            return false
         }
     }
 
@@ -65,8 +69,9 @@ final class JSONFileManagerCache: Cache {
 final class InMemoryCache: Cache {
     private var todoList: [Todo] = []
 
-    func save(todos: [Todo]) {
+    func save(todos: [Todo]) -> Bool {
         todoList = todos
+        return true
     }
 
     func load() -> [Todo]? {
@@ -81,20 +86,24 @@ final class InMemoryCache: Cache {
 //   to alter the completion status of a specific todo using its index.
 // * A function named `func deleteTodo(atIndex index: Int)` to remove a todo using its index.
 final class TodoManager {
-    let cacheManager = InMemoryCache() // Can be swapped with JSONFileManagerCache() for disk persistance in JSON format 
+    private var cache: Cache;
+    
+    init(cache: Cache) {
+        self.cache = cache
+    }
 
     func addTodo(with title: String) {
         let newTodo = Todo(id: UUID(), title: title, isCompleted: false)
-        var todoList = cacheManager.load() ?? [];
+        var todoList = cache.load() ?? [];
         todoList.append(newTodo)
-        cacheManager.save(todos: todoList)
+        cache.save(todos: todoList)
         print("📌 Todo added!")
     }
 
     func listTodos() {
         print("📝 Your Todos:")
 
-        let todoList = cacheManager.load() ?? []
+        let todoList = cache.load() ?? []
         for (index, todo) in todoList.enumerated() {
             print("\(index + 1). \(todo)")
         }
@@ -106,9 +115,9 @@ final class TodoManager {
             return    
         }
         
-        var todoList = cacheManager.load() ?? [];
+        var todoList = cache.load() ?? [];
         todoList[index - 1].isCompleted = true
-        cacheManager.save(todos: todoList)
+        cache.save(todos: todoList)
         print("🔄 Todo completion status toggled!")
     }
 
@@ -118,14 +127,14 @@ final class TodoManager {
             return    
         }
         
-        var todoList = cacheManager.load() ?? [];
+        var todoList = cache.load() ?? [];
         todoList.remove(at: index - 1)
-        cacheManager.save(todos: todoList)
+        cache.save(todos: todoList)
         print("🗑️ Todo deleted!")
     }
 
     func todoExists(_ index: Int) -> Bool {
-         let todoList = cacheManager.load() ?? [];
+         let todoList = cache.load() ?? [];
          return index >= 0 && index < todoList.count
     } 
 }
@@ -138,7 +147,7 @@ final class TodoManager {
 //  * The enum should be nested inside the definition of the `App` class
 final class App {
 
-    let todoManager = TodoManager()
+    let todoManager = TodoManager(cache: InMemoryCache())
 
     enum Command : String {
         case add
