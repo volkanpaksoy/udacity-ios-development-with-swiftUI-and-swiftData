@@ -16,11 +16,19 @@ struct EventForm: View {
     
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     
-    // let selectedDate: Date = event.date
-    
     func isNewEvent(event: Event) -> Bool {
         // If the unique ID is not in the list then it's a new event
         return Event.all.filter{ $0.id == event.id }.count == 0
+    }
+    
+    func onSave (event: Event) -> Void {
+        if let index = Event.all.firstIndex(where: {$0.id == event.id}) {
+            Event.all[index] = event
+        } else {
+            Event.all.append(event)
+        }
+        
+        presentationMode.wrappedValue.dismiss()
     }
     
     var body: some View {
@@ -44,14 +52,9 @@ struct EventForm: View {
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button("AddOrEdit", systemImage: "checkmark") {
-                    if let index = Event.all.firstIndex(where: {$0.id == event.id}) {
-                        Event.all[index] = event
-                        presentationMode.wrappedValue.dismiss()
-                    } else {
-                        Event.all.append(event)
-                        presentationMode.wrappedValue.dismiss()
-                    }
+                    onSave(event: event)
                 }
+                .disabled($event.title.wrappedValue.isEmpty)
             }
         }
        .navigationTitle(navigationTitle)

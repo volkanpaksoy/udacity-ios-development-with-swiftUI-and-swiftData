@@ -14,9 +14,7 @@ struct EventsView: View {
     var body: some View {
         NavigationStack {
             List(sortedEvents, id: \.self.id) { event in
-                NavigationLink {
-                    EventForm(event: event)
-                } label: {
+                NavigationLink(value: event) {
                     EventRow(event: event)
                 }
                 .swipeActions {
@@ -25,6 +23,9 @@ struct EventsView: View {
                     }
                 }
             }
+            .navigationDestination(for: Event.self, destination: { event in
+                EventForm(event: event)
+            })
             .onAppear() {
                 sortedEvents = Event.all.sorted()
             }
