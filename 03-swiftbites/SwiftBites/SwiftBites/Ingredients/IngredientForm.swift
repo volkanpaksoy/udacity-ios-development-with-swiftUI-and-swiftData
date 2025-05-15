@@ -1,9 +1,10 @@
+import SwiftData
 import SwiftUI
 
 struct IngredientForm: View {
   enum Mode: Hashable {
     case add
-    case edit(MockIngredient)
+    case edit(Ingredient)
   }
 
   var mode: Mode
@@ -23,7 +24,7 @@ struct IngredientForm: View {
   private let title: String
   @State private var name: String
   @State private var error: Error?
-  @Environment(\.storage) private var storage
+  @Environment(\.modelContext) private var context
   @Environment(\.dismiss) private var dismiss
   @FocusState private var isNameFocused: Bool
 
@@ -66,8 +67,8 @@ struct IngredientForm: View {
 
   // MARK: - Data
 
-  private func delete(ingredient: MockIngredient) {
-    storage.deleteIngredient(id: ingredient.id)
+  private func delete(ingredient: Ingredient) {
+    context.delete(ingredient)
     dismiss()
   }
 
@@ -75,9 +76,10 @@ struct IngredientForm: View {
     do {
       switch mode {
       case .add:
-        try storage.addIngredient(name: name)
+        context.insert(Ingredient(name: name))
       case .edit(let ingredient):
-        try storage.updateIngredient(id: ingredient.id, name: name)
+        ingredient.name = name
+        try context.save()
       }
       dismiss()
     } catch {

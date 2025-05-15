@@ -1,7 +1,8 @@
+import SwiftData
 import SwiftUI
 
 struct IngredientsView: View {
-  typealias Selection = (MockIngredient) -> Void
+  typealias Selection = (Ingredient) -> Void
 
   let selection: Selection?
 
@@ -9,10 +10,11 @@ struct IngredientsView: View {
     self.selection = selection
   }
 
-  @Environment(\.storage) private var storage
+  @Environment(\.modelContext) private var context
   @Environment(\.dismiss) private var dismiss
   @State private var query = ""
-
+  @Query var ingredients: [Ingredient]
+    
   // MARK: - Body
 
   var body: some View {
@@ -20,7 +22,7 @@ struct IngredientsView: View {
       content
         .navigationTitle("Ingredients")
         .toolbar {
-          if !storage.ingredients.isEmpty {
+            if !ingredients.isEmpty {
             NavigationLink(value: IngredientForm.Mode.add) {
               Label("Add", systemImage: "plus")
             }
@@ -36,10 +38,10 @@ struct IngredientsView: View {
 
   @ViewBuilder
   private var content: some View {
-    if storage.ingredients.isEmpty {
+    if ingredients.isEmpty {
       empty
     } else {
-      list(for: storage.ingredients.filter {
+      list(for: ingredients.filter {
         if query.isEmpty {
           return true
         } else {
@@ -74,7 +76,7 @@ struct IngredientsView: View {
     .listRowSeparator(.hidden)
   }
 
-  private func list(for ingredients: [MockIngredient]) -> some View {
+  private func list(for ingredients: [Ingredient]) -> some View {
     List {
       if ingredients.isEmpty {
         noResults
@@ -94,7 +96,7 @@ struct IngredientsView: View {
   }
 
   @ViewBuilder
-  private func row(for ingredient: MockIngredient) -> some View {
+  private func row(for ingredient: Ingredient) -> some View {
     if let selection {
       Button(
         action: {
@@ -112,14 +114,19 @@ struct IngredientsView: View {
     }
   }
 
-  private func title(for ingredient: MockIngredient) -> some View {
+  private func title(for ingredient: Ingredient) -> some View {
     Text(ingredient.name)
       .font(.title3)
   }
 
   // MARK: - Data
 
-  private func delete(ingredient: MockIngredient) {
-    storage.deleteIngredient(id: ingredient.id)
+  private func delete(ingredient: Ingredient) {
+      context.delete(ingredient)
   }
+}
+
+#Preview {
+    IngredientsView()
+        .modelContainer(for: Ingredient.self, inMemory: true)
 }
