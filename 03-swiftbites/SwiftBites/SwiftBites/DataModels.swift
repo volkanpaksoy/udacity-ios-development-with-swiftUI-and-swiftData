@@ -2,9 +2,9 @@ import Foundation
 import SwiftData
 
 @Model
-class Category: Identifiable, Hashable {
+final class Category: Identifiable, Hashable {
     var id = UUID()
-    var name: String
+    @Attribute(.unique) var name: String
     var recipes: [Recipe]
     
     init(id: UUID = UUID(), name: String, recipes: [Recipe] = []) {
@@ -23,9 +23,9 @@ class Category: Identifiable, Hashable {
 }
 
 @Model
-class Ingredient: Identifiable, Hashable {
+final class Ingredient: Identifiable, Hashable {
     var id = UUID()
-    var name: String
+    @Attribute(.unique) var name: String
     
     init(id: UUID = UUID(), name: String) {
         self.id = id
@@ -42,7 +42,7 @@ class Ingredient: Identifiable, Hashable {
 }
 
 @Model
-class RecipeIngredient: Identifiable, Hashable {
+final class RecipeIngredient: Identifiable, Hashable {
     var id = UUID()
     var ingredient: Ingredient
     var quantity: String
@@ -62,9 +62,9 @@ class RecipeIngredient: Identifiable, Hashable {
 }
 
 @Model
-class Recipe: Identifiable, Hashable {
+final class Recipe: Identifiable, Hashable {
     var id = UUID()
-    var name: String
+    @Attribute(.unique) var name: String
     var summary: String
     var category: Category?
     var serving: Int

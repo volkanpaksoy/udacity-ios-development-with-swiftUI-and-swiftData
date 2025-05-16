@@ -6,6 +6,22 @@ struct RecipesView: View {
   @State private var query = ""
   @State private var sortOrder = SortDescriptor(\Recipe.name)
   @Query var recipes: [Recipe]
+  private var filteredRecipes: [Recipe] {
+      let recipesPredicate = #Predicate<Recipe> {
+          $0.name.localizedStandardContains(query)
+      }
+      
+      let descriptor = FetchDescriptor<Recipe>(
+        predicate: query.isEmpty ? nil : recipesPredicate
+      )
+      
+      do {
+          let filteredRecipes = try context.fetch(descriptor)
+          return filteredRecipes
+      } catch {
+          return []
+      }
+  }
     
   // MARK: - Body
 
@@ -61,13 +77,7 @@ struct RecipesView: View {
     if recipes.isEmpty {
       empty
     } else {
-      list(for: recipes.filter {
-        if query.isEmpty {
-          return true
-        } else {
-          return $0.name.localizedStandardContains(query) || $0.summary.localizedStandardContains(query)
-        }
-      }.sorted(using: sortOrder))
+      list(for: filteredRecipes.sorted(using: sortOrder))
     }
   }
 

@@ -14,6 +14,22 @@ struct IngredientsView: View {
   @Environment(\.dismiss) private var dismiss
   @State private var query = ""
   @Query var ingredients: [Ingredient]
+  private var filteredIngredients: [Ingredient] {
+    let ingredientsPredicate = #Predicate<Ingredient> {
+        $0.name.localizedStandardContains(query)
+    }
+    
+    let descriptor = FetchDescriptor<Ingredient>(
+      predicate: query.isEmpty ? nil : ingredientsPredicate
+    )
+    
+    do {
+        let filteredIngredients = try context.fetch(descriptor)
+        return filteredIngredients
+    } catch {
+        return []
+    }
+  }
     
   // MARK: - Body
 
@@ -41,13 +57,7 @@ struct IngredientsView: View {
     if ingredients.isEmpty {
       empty
     } else {
-      list(for: ingredients.filter {
-        if query.isEmpty {
-          return true
-        } else {
-          return $0.name.localizedStandardContains(query)
-        }
-      })
+      list(for: filteredIngredients)
     }
   }
 

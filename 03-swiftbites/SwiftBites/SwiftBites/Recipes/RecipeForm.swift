@@ -276,16 +276,19 @@ struct RecipeForm: View {
     do {
       switch mode {
       case .add:
-        context.insert(Recipe(
+        let recipe = Recipe(
             name: name,
             summary: summary,
             category: category,
             serving: serving,
             time: time,
-            ingredients: ingredients,
             instructions: instructions,
             imageData: imageData
-        ))
+        )
+        recipe.ingredients = ingredients
+        recipe.category = category
+        category?.recipes.append(recipe)
+        context.insert(recipe)
       case .edit(let recipe):
         recipe.name = name
         recipe.summary = summary

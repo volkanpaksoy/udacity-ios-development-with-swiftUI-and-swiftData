@@ -5,6 +5,22 @@ struct CategoriesView: View {
   @Environment(\.modelContext) private var context
   @State private var query = ""
   @Query var categories: [Category]
+  private var filteredCategories: [Category] {
+    let categoriesPredicate = #Predicate<Category> {
+        $0.name.localizedStandardContains(query)
+    }
+    
+    let descriptor = FetchDescriptor<Category>(
+      predicate: query.isEmpty ? nil : categoriesPredicate
+    )
+    
+    do {
+        let filteredCategories = try context.fetch(descriptor)
+        return filteredCategories
+    } catch {
+        return []
+    }
+  }
     
   // MARK: - Body
 
@@ -35,13 +51,7 @@ struct CategoriesView: View {
     if categories.isEmpty {
       empty
     } else {
-      list(for: categories.filter {
-        if query.isEmpty {
-          return true
-        } else {
-          return $0.name.localizedStandardContains(query)
-        }
-      })
+      list(for: filteredCategories)
     }
   }
 
