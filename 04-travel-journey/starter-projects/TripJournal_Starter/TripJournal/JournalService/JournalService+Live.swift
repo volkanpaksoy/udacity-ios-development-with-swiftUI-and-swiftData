@@ -6,7 +6,7 @@ class LiveJournalService: JournalService {
     @Published private var token: Token?
     
     private let baseURL: URL = URL(string: "http://localhost:8000")!
-    
+
     
     var isAuthenticated: AnyPublisher<Bool, Never> {
         $token
@@ -35,16 +35,30 @@ class LiveJournalService: JournalService {
         return request
     }
     
+    private func createJsonEncoder() -> JSONEncoder {
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        encoder.keyEncodingStrategy = .convertToSnakeCase
+        return encoder
+    }
+    
+    private func createJsonDecoder() -> JSONDecoder {
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+        return decoder
+    }
+    
     
     func register(username : String, password : String) async throws -> Token {
         var request = try createURLRequest(path: "register", method: "POST", isAuthenticationRequired: false)
-                
+        
         let body: [String: Any] = ["username": username, "password": password]
         request.httpBody = try? JSONSerialization.data(withJSONObject: body)
 
         let (data, _) = try await URLSession.shared.data(for: request)
-        let jsonDecoder = JSONDecoder()
-        jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
+        
+        let jsonDecoder = createJsonDecoder()
         let authToken = try jsonDecoder.decode(Token.self, from: data)
         self.token = authToken
         return authToken
@@ -55,8 +69,8 @@ class LiveJournalService: JournalService {
         request.httpBody = "grant_type=&username=\(username)&password=\(password)".data(using: .utf8)
         
         let (data, _) = try await URLSession.shared.data(for: request)
-        let jsonDecoder = JSONDecoder()
-        jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
+        
+        let jsonDecoder = createJsonDecoder()
         let authToken = try jsonDecoder.decode(Token.self, from: data)
         self.token = authToken
         return authToken
@@ -71,15 +85,12 @@ class LiveJournalService: JournalService {
     func createTrip(with tripCreate: TripCreate) async throws -> Trip {
         var request = try createURLRequest(path: "trips", method: "POST")
         
-        let jsonEncoder = JSONEncoder()
-        jsonEncoder.keyEncodingStrategy = .convertToSnakeCase
-        jsonEncoder.dateEncodingStrategy = .iso8601
+        let jsonEncoder = createJsonEncoder()
         request.httpBody = try jsonEncoder.encode(tripCreate)
         
         let (data, _) = try await URLSession.shared.data(for: request)
-        let jsonDecoder = JSONDecoder()
-        jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
-        jsonDecoder.dateDecodingStrategy = .iso8601
+        
+        let jsonDecoder = createJsonDecoder()
         let trip = try jsonDecoder.decode(Trip.self, from: data)
         return trip
     }
@@ -88,9 +99,8 @@ class LiveJournalService: JournalService {
         let request = try createURLRequest(path: "trips", method: "GET")
         
         let (data, _) = try await URLSession.shared.data(for: request)
-        let jsonDecoder = JSONDecoder()
-        jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
-        jsonDecoder.dateDecodingStrategy = .iso8601
+        
+        let jsonDecoder = createJsonDecoder()
         let trips = try jsonDecoder.decode([Trip].self, from: data)
         return trips
     }
@@ -99,8 +109,8 @@ class LiveJournalService: JournalService {
         let request = try createURLRequest(path: "trips/\(tripId)", method: "GET")
         
         let (data, _) = try await URLSession.shared.data(for: request)
-        let jsonDecoder = JSONDecoder()
-        jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
+        
+        let jsonDecoder = createJsonDecoder()
         let trip = try jsonDecoder.decode(Trip.self, from: data)
         return trip
     }
@@ -108,14 +118,12 @@ class LiveJournalService: JournalService {
     func updateTrip(withId tripId: Trip.ID, and tripUpdate: TripUpdate) async throws -> Trip {
         var request = try createURLRequest(path: "trips/\(tripId)", method: "PUT")
         
-        let jsonEncoder = JSONEncoder()
-        jsonEncoder.keyEncodingStrategy = .convertToSnakeCase
-        jsonEncoder.dateEncodingStrategy = .iso8601
+        let jsonEncoder = createJsonEncoder()
         request.httpBody = try jsonEncoder.encode(tripUpdate)
         
         let (data, _) = try await URLSession.shared.data(for: request)
-        let jsonDecoder = JSONDecoder()
-        jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
+        
+        let jsonDecoder = createJsonDecoder()
         let trip = try jsonDecoder.decode(Trip.self, from: data)
         return trip
     }
@@ -131,30 +139,25 @@ class LiveJournalService: JournalService {
     func createEvent(with eventCreate: EventCreate) async throws -> Event {
         var request = try createURLRequest(path: "events", method: "POST")
         
-        let jsonEncoder = JSONEncoder()
-        jsonEncoder.keyEncodingStrategy = .convertToSnakeCase
-        jsonEncoder.dateEncodingStrategy = .iso8601
+        let jsonEncoder = createJsonEncoder()
         request.httpBody = try jsonEncoder.encode(eventCreate)
         
         let (data, _) = try await URLSession.shared.data(for: request)
-        let jsonDecoder = JSONDecoder()
-        jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
-        jsonDecoder.dateDecodingStrategy = .iso8601
+        
+        let jsonDecoder = createJsonDecoder()
         let event = try jsonDecoder.decode(Event.self, from: data)
         return event
     }
-
+    
     func updateEvent(withId eventId: Event.ID, and eventUpdate: EventUpdate) async throws -> Event {
         var request = try createURLRequest(path: "events/\(eventId)", method: "PUT")
         
-        let jsonEncoder = JSONEncoder()
-        jsonEncoder.keyEncodingStrategy = .convertToSnakeCase
-        jsonEncoder.dateEncodingStrategy = .iso8601
+        let jsonEncoder = createJsonEncoder()
         request.httpBody = try jsonEncoder.encode(eventUpdate)
         
         let (data, _) = try await URLSession.shared.data(for: request)
-        let jsonDecoder = JSONDecoder()
-        jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
+        
+        let jsonDecoder = createJsonDecoder()
         let event = try jsonDecoder.decode(Event.self, from: data)
         return event
     }
@@ -170,15 +173,12 @@ class LiveJournalService: JournalService {
     func createMedia(with mediaCreate: MediaCreate) async throws -> Media {
         var request = try createURLRequest(path: "media", method: "POST")
         
-        let jsonEncoder = JSONEncoder()
-        jsonEncoder.keyEncodingStrategy = .convertToSnakeCase
-        jsonEncoder.dateEncodingStrategy = .iso8601
+        let jsonEncoder = createJsonEncoder()
         request.httpBody = try jsonEncoder.encode(mediaCreate)
         
         let (data, _) = try await URLSession.shared.data(for: request)
-        let jsonDecoder = JSONDecoder()
-        jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
-        jsonDecoder.dateDecodingStrategy = .iso8601
+        
+        let jsonDecoder = createJsonDecoder()
         let media = try jsonDecoder.decode(Media.self, from: data)
         return media
     }
