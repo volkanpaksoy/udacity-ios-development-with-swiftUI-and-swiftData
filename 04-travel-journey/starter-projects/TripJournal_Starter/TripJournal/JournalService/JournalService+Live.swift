@@ -121,7 +121,7 @@ class LiveJournalService: JournalService {
     }
 
     func deleteTrip(withId tripId: Trip.ID) async throws {
-        let request = try createURLRequest(path: "trips/\(tripId)", method: "PUT", contentType: "*/*")
+        let request = try createURLRequest(path: "trips/\(tripId)", method: "DELETE", contentType: "*/*")
         
         let _ = try await URLSession.shared.data(for: request)
     }
@@ -160,7 +160,7 @@ class LiveJournalService: JournalService {
     }
 
     func deleteEvent(withId eventId: Event.ID) async throws {
-        let request = try createURLRequest(path: "events/\(eventId)", method: "PUT", contentType: "*/*")
+        let request = try createURLRequest(path: "events/\(eventId)", method: "DELETE", contentType: "*/*")
         
         let _ = try await URLSession.shared.data(for: request)
     }
@@ -184,7 +184,7 @@ class LiveJournalService: JournalService {
     }
 
     func deleteMedia(withId mediaId: Media.ID) async throws {
-        let request = try createURLRequest(path: "media/\(mediaId)", method: "PUT", contentType: "*/*")
+        let request = try createURLRequest(path: "media/\(mediaId)", method: "DELETE", contentType: "*/*")
         
         let _ = try await URLSession.shared.data(for: request)
     }
