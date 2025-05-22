@@ -9,10 +9,9 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - db_volume:/db
+      - ./db/:/db
       - static_volume:/static
     restart: always
 
 volumes:
   static_volume:
-  db_volume:
