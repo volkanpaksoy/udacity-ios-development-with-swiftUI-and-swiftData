@@ -38,12 +38,7 @@ class LiveJournalService: JournalService {
     
     func register(username : String, password : String) async throws -> Token {
         var request = try createURLRequest(path: "register", method: "POST", isAuthenticationRequired: false)
-        
-//        var request = URLRequest(url: url)
-//        request.httpMethod = "POST"
-//        request.setValue("application/json", forHTTPHeaderField: "Accept")
-//        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        
+                
         let body: [String: Any] = ["username": username, "password": password]
         request.httpBody = try? JSONSerialization.data(withJSONObject: body)
 
@@ -56,15 +51,6 @@ class LiveJournalService: JournalService {
     }
 
     func logIn(username : String, password : String) async throws -> Token {
-//        guard let url = URL(string: "\(baseURL)/token") else {
-//            throw URLError(.badURL)
-//        }
-//        
-//        var request = URLRequest(url: url)
-//        request.httpMethod = "POST"
-//        request.setValue("application/json", forHTTPHeaderField: "Accept")
-//        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-        
         var request = try createURLRequest(path: "token", method: "POST", isAuthenticationRequired: false, contentType: "application/x-www-form-urlencoded")
         request.httpBody = "grant_type=&username=\(username)&password=\(password)".data(using: .utf8)
         
@@ -83,20 +69,6 @@ class LiveJournalService: JournalService {
     
     
     func createTrip(with tripCreate: TripCreate) async throws -> Trip {
-//        guard let url = URL(string: "\(baseURL)/trips") else {
-//            throw URLError(.badURL)
-//        }
-//        
-//        guard let authToken = token?.accessToken else {
-//            throw URLError(.userAuthenticationRequired)
-//        }
-//        
-//        var request = URLRequest(url: url)
-//        request.httpMethod = "POST"
-//        request.setValue("application/json", forHTTPHeaderField: "Accept")
-//        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-//        request.setValue("Bearer \(authToken)", forHTTPHeaderField: "Authorization")
-        
         var request = try createURLRequest(path: "trips", method: "POST")
         
         let jsonEncoder = JSONEncoder()
@@ -113,19 +85,6 @@ class LiveJournalService: JournalService {
     }
 
     func getTrips() async throws -> [Trip] {
-//        guard let url = URL(string: "\(baseURL)/trips") else {
-//            throw URLError(.badURL)
-//        }
-//        
-//        guard let authToken = token?.accessToken else {
-//            throw URLError(.userAuthenticationRequired)
-//        }
-//        
-//        var request = URLRequest(url: url)
-//        request.httpMethod = "GET"
-//        request.setValue("application/json", forHTTPHeaderField: "Accept")
-//        request.setValue("Bearer \(authToken)", forHTTPHeaderField: "Authorization")
-        
         let request = try createURLRequest(path: "trips", method: "GET")
         
         let (data, _) = try await URLSession.shared.data(for: request)
@@ -137,19 +96,6 @@ class LiveJournalService: JournalService {
     }
 
     func getTrip(withId tripId: Trip.ID) async throws -> Trip {
-//        guard let url = URL(string: "\(baseURL)/trips/\(tripId)") else {
-//            throw URLError(.badURL)
-//        }
-//        
-//        guard let authToken = token?.accessToken else {
-//            throw URLError(.userAuthenticationRequired)
-//        }
-//        
-//        var request = URLRequest(url: url)
-//        request.httpMethod = "GET"
-//        request.setValue("application/json", forHTTPHeaderField: "Accept")
-//        request.setValue("Bearer \(authToken)", forHTTPHeaderField: "Authorization")
-        
         let request = try createURLRequest(path: "trips/\(tripId)", method: "GET")
         
         let (data, _) = try await URLSession.shared.data(for: request)
@@ -160,20 +106,6 @@ class LiveJournalService: JournalService {
     }
 
     func updateTrip(withId tripId: Trip.ID, and tripUpdate: TripUpdate) async throws -> Trip {
-//        guard let url = URL(string: "\(baseURL)/trips/\(tripId)") else {
-//            throw URLError(.badURL)
-//        }
-//        
-//        guard let authToken = token?.accessToken else {
-//            throw URLError(.userAuthenticationRequired)
-//        }
-//        
-//        var request = URLRequest(url: url)
-//        request.httpMethod = "PUT"
-//        request.setValue("application/json", forHTTPHeaderField: "Accept")
-//        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-//        request.setValue("Bearer \(authToken)", forHTTPHeaderField: "Authorization")
-        
         var request = try createURLRequest(path: "trips/\(tripId)", method: "PUT")
         
         let jsonEncoder = JSONEncoder()
@@ -189,19 +121,6 @@ class LiveJournalService: JournalService {
     }
 
     func deleteTrip(withId tripId: Trip.ID) async throws {
-//        guard let url = URL(string: "\(baseURL)/trips/\(tripId)") else {
-//            throw URLError(.badURL)
-//        }
-//        
-//        guard let authToken = token?.accessToken else {
-//            throw URLError(.userAuthenticationRequired)
-//        }
-//        
-//        var request = URLRequest(url: url)
-//        request.httpMethod = "DELETE"
-//        request.setValue("*/*", forHTTPHeaderField: "Accept")
-//        request.setValue("Bearer \(authToken)", forHTTPHeaderField: "Authorization")
-        
         let request = try createURLRequest(path: "trips/\(tripId)", method: "PUT", contentType: "*/*")
         
         let _ = try await URLSession.shared.data(for: request)
@@ -210,20 +129,6 @@ class LiveJournalService: JournalService {
     
     
     func createEvent(with eventCreate: EventCreate) async throws -> Event {
-//        guard let url = URL(string: "\(baseURL)/events") else {
-//            throw URLError(.badURL)
-//        }
-//        
-//        guard let authToken = token?.accessToken else {
-//            throw URLError(.userAuthenticationRequired)
-//        }
-//        
-//        var request = URLRequest(url: url)
-//        request.httpMethod = "POST"
-//        request.setValue("application/json", forHTTPHeaderField: "Accept")
-//        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-//        request.setValue("Bearer \(authToken)", forHTTPHeaderField: "Authorization")
-        
         var request = try createURLRequest(path: "events", method: "POST")
         
         let jsonEncoder = JSONEncoder()
@@ -240,20 +145,6 @@ class LiveJournalService: JournalService {
     }
 
     func updateEvent(withId eventId: Event.ID, and eventUpdate: EventUpdate) async throws -> Event {
-//        guard let url = URL(string: "\(baseURL)/events/\(eventId)") else {
-//            throw URLError(.badURL)
-//        }
-//        
-//        guard let authToken = token?.accessToken else {
-//            throw URLError(.userAuthenticationRequired)
-//        }
-//        
-//        var request = URLRequest(url: url)
-//        request.httpMethod = "PUT"
-//        request.setValue("application/json", forHTTPHeaderField: "Accept")
-//        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-//        request.setValue("Bearer \(authToken)", forHTTPHeaderField: "Authorization")
-        
         var request = try createURLRequest(path: "events/\(eventId)", method: "PUT")
         
         let jsonEncoder = JSONEncoder()
@@ -269,40 +160,14 @@ class LiveJournalService: JournalService {
     }
 
     func deleteEvent(withId eventId: Event.ID) async throws {
-//        guard let url = URL(string: "\(baseURL)/events/\(eventId)") else {
-//            throw URLError(.badURL)
-//        }
-//        
-//        guard let authToken = token?.accessToken else {
-//            throw URLError(.userAuthenticationRequired)
-//        }
-//        
-//        var request = URLRequest(url: url)
-//        request.httpMethod = "DELETE"
-//        request.setValue("*/*", forHTTPHeaderField: "Accept")
-//        request.setValue("Bearer \(authToken)", forHTTPHeaderField: "Authorization")
-        
         let request = try createURLRequest(path: "events/\(eventId)", method: "PUT", contentType: "*/*")
+        
         let _ = try await URLSession.shared.data(for: request)
     }
 
     
     
     func createMedia(with mediaCreate: MediaCreate) async throws -> Media {
-//        guard let url = URL(string: "\(baseURL)/media") else {
-//            throw URLError(.badURL)
-//        }
-//        
-//        guard let authToken = token?.accessToken else {
-//            throw URLError(.userAuthenticationRequired)
-//        }
-//        
-//        var request = URLRequest(url: url)
-//        request.httpMethod = "POST"
-//        request.setValue("application/json", forHTTPHeaderField: "Accept")
-//        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-//        request.setValue("Bearer \(authToken)", forHTTPHeaderField: "Authorization")
-        
         var request = try createURLRequest(path: "media", method: "POST")
         
         let jsonEncoder = JSONEncoder()
@@ -319,20 +184,8 @@ class LiveJournalService: JournalService {
     }
 
     func deleteMedia(withId mediaId: Media.ID) async throws {
-//        guard let url = URL(string: "\(baseURL)/media/\(mediaId)") else {
-//            throw URLError(.badURL)
-//        }
-//        
-//        guard let authToken = token?.accessToken else {
-//            throw URLError(.userAuthenticationRequired)
-//        }
-//        
-//        var request = URLRequest(url: url)
-//        request.httpMethod = "DELETE"
-//        request.setValue("*/*", forHTTPHeaderField: "Accept")
-//        request.setValue("Bearer \(authToken)", forHTTPHeaderField: "Authorization")
-        
         let request = try createURLRequest(path: "media/\(mediaId)", method: "PUT", contentType: "*/*")
+        
         let _ = try await URLSession.shared.data(for: request)
     }
 }

@@ -28,10 +28,6 @@ struct EventCreate: Codable {
     let date: Date
     let location: Location?
     let transitionFromPrevious: String?
-    
-//    func encode(to encoder: Encoder) throws {
-//        
-//    }
 }
 
 /// An object that can be used to update an existing event.
